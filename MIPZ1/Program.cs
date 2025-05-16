@@ -149,7 +149,7 @@ namespace MIPZ1
                         {
                             nx += dx[d];
                             ny += dy[d];
-                            if (nx < 0 || nx >= BoardSize || ny < 0 || ny >= BoardSize || board[nx, ny] != player)
+                            if (!IsValidCoordinateAndPlayer(nx, ny, board, player))
                                 break;
                             count++;
                         }
@@ -159,12 +159,12 @@ namespace MIPZ1
                         {
                             int prevX = x - dx[d];
                             int prevY = y - dy[d];
-                            if (prevX >= 0 && prevX < BoardSize && prevY >= 0 && prevY < BoardSize && board[prevX, prevY] == player)
+                            if (IsValidCoordinateAndPlayer(prevX, prevY, board, player))
                                 continue;
 
                             int nextX = nx;
                             int nextY = ny;
-                            if (nextX >= 0 && nextX < BoardSize && nextY >= 0 && nextY < BoardSize && board[nextX, nextY] == player)
+                            if (IsValidCoordinateAndPlayer(nextX, nextY, board, player))
                                 continue;
 
                             // Виграв player
@@ -176,6 +176,19 @@ namespace MIPZ1
             
             // Ніхто не виграв
             return (0, 0, 0); 
+        }
+
+        /// <summary>
+        /// Перевіряє, чи координата знаходиться в межах дошки і чи камінь належить певному гравцю
+        /// </summary>
+        /// <param name="x">Координата X</param>
+        /// <param name="y">Координата Y</param>
+        /// <param name="board">Дошка</param>
+        /// <param name="player">Гравець (1 або 2)</param>
+        /// <returns>True, якщо координата валідна і камінь належить гравцю, інакше False</returns>
+        static bool IsValidCoordinateAndPlayer(int x, int y, int[,] board, int player)
+        {
+            return x >= 0 && x < BoardSize && y >= 0 && y < BoardSize && board[x, y] == player;
         }
     }
 }
