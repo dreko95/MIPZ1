@@ -141,18 +141,17 @@ namespace MIPZ1
                     int player = board[x, y];
                     for (int d = 0; d < 4; d++)
                     {
-                        int count = 1;
+                        int count = 0;
                         int nx = x, ny = y;
 
                         // Перевірка на 5 каменів поспіль
-                        while (true)
+                        do 
                         {
+                            count++;
                             nx += dx[d];
                             ny += dy[d];
-                            if (!IsValidCoordinateAndPlayer(nx, ny, board, player))
-                                break;
-                            count++;
-                        }
+                        } 
+                        while (IsValidCoordinateAndPlayer(nx, ny, board, player));
 
                         // Перевірка на більше ніж 5 каменів поспіль
                         if (count == 5)
@@ -160,11 +159,6 @@ namespace MIPZ1
                             int prevX = x - dx[d];
                             int prevY = y - dy[d];
                             if (IsValidCoordinateAndPlayer(prevX, prevY, board, player))
-                                continue;
-
-                            int nextX = nx;
-                            int nextY = ny;
-                            if (IsValidCoordinateAndPlayer(nextX, nextY, board, player))
                                 continue;
 
                             // Виграв player
