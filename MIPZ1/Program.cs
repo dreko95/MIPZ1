@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace MIPZ1
@@ -23,21 +24,16 @@ namespace MIPZ1
                 }
 
                 string[] lines = File.ReadAllLines(inputFilePath);
-                int testCases = int.Parse(lines[0]);
-                int lineIndex = 1;
 
-                for (int t = 0; t < testCases; t++)
+                if (!TryGetBoards(lines, out List<int[,]> boards, out string errorMessage))
                 {
-                    int[,] board = new int[BoardSize, BoardSize];
-                    for (int i = 0; i < BoardSize; i++)
-                    {
-                        string[] row = lines[lineIndex++].Split(' ');
-                        for (int j = 0; j < BoardSize; j++)
-                        {
-                            board[i, j] = int.Parse(row[j]);
-                        }
-                    }
+                    Console.WriteLine($"Error: {errorMessage}");
+                    Console.ReadKey();
+                    return;
+                }
 
+                foreach (var board in boards)
+                {
                     var result = CheckWinner(board);
                     Console.WriteLine(result.Item1);
                     if (result.Item1 != 0)
@@ -45,7 +41,7 @@ namespace MIPZ1
                         Console.WriteLine($"{result.Item2} {result.Item3}");
                     }
 
-                    lineIndex++;
+                    Console.WriteLine();
                 }
             }
             catch (Exception ex)
@@ -55,6 +51,68 @@ namespace MIPZ1
             
 
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Спроба отримати список дошок з вхідних даних.
+        /// </summary>
+        /// <param name="lines">Масив рядків з файлу.</param>
+        /// <param name="boards">Список дошок, якщо дані валідні.</param>
+        /// <param name="errorMessage">Повідомлення про помилку, якщо перевірка не пройдена.</param>
+        /// <returns>True, якщо дані валідні, інакше False.</returns>
+        static bool TryGetBoards(string[] lines, out List<int[,]> boards, out string errorMessage)
+        {
+            boards = new List<int[,]>();
+            errorMessage = string.Empty;
+
+            if (lines.Length < 1)
+            {
+                errorMessage = "Input file is empty or does not contain the number of test cases.";
+                return false;
+            }
+
+            if (!int.TryParse(lines[0], out int testCases) || testCases <= 0)
+            {
+                errorMessage = "The first line must contain a positive integer representing the number of test cases.";
+                return false;
+            }
+
+            int lineIndex = 1;
+            for (int t = 0; t < testCases; t++)
+            {
+                if (lineIndex + BoardSize > lines.Length)
+                {
+                    errorMessage = $"Test case {t + 1} does not contain exactly {BoardSize} rows.";
+                    return false;
+                }
+
+                int[,] board = new int[BoardSize, BoardSize];
+                for (int i = 0; i < BoardSize; i++)
+                {
+                    string[] row = lines[lineIndex++].Split(' ');
+                    if (row.Length != BoardSize)
+                    {
+                        errorMessage = $"Row {i + 1} in test case {t + 1} does not contain exactly {BoardSize} columns.";
+                        return false;
+                    }
+
+                    for (int j = 0; j < BoardSize; j++)
+                    {
+                        if (!int.TryParse(row[j], out int value) || (value != 0 && value != 1 && value != 2))
+                        {
+                            errorMessage = $"Invalid value '{row[j]}' at row {i + 1}, column {j + 1} in test case {t + 1}. Allowed values are 0, 1, 2.";
+                            return false;
+                        }
+
+                        board[i, j] = value;
+                    }
+                }
+
+                boards.Add(board);
+                lineIndex++;
+            }
+
+            return true;
         }
 
         /// <summary>
