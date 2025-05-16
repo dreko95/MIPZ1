@@ -7,6 +7,8 @@ namespace MIPZ1
     internal class Program
     {
         private const int BoardSize = 19;
+        private const int WinCombination = 5;
+        private const int DirectionsDisplacementCount = 4;
 
         /// <summary>
         /// Основний метод програми. Запускається при запуску консолі програми.
@@ -139,7 +141,7 @@ namespace MIPZ1
                         continue;
 
                     int player = board[x, y];
-                    for (int d = 0; d < 4; d++)
+                    for (int d = 0; d < DirectionsDisplacementCount; d++)
                     {
                         int count = 0;
                         int nx = x, ny = y;
@@ -154,7 +156,7 @@ namespace MIPZ1
                         while (IsValidCoordinateAndPlayer(nx, ny, board, player));
 
                         // Перевірка на більше ніж 5 каменів поспіль
-                        if (count == 5)
+                        if (count == WinCombination)
                         {
                             int prevX = x - dx[d];
                             int prevY = y - dy[d];
